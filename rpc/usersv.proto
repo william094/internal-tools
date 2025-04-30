@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+package rpc;
+
+import "rpc/base.proto";
+
+option go_package = "./rpc";
+
+service UserService {
+  
+  // 用户详情
+  rpc UserDetail (UserDetailReq) returns (UserDetailRes);
+}
+service AuthService {
+  
+  // 设备注册
+  rpc RegisterDevice (RegisterDeviceReq) returns (RegisterDeviceRes);
+  
+  // 登录
+  rpc Login (LoginReq) returns (LoginRes);
+  
+  // 登出
+  rpc Logout (LogoutReq) returns (LogoutRes);
+  
+  // 生成token
+  rpc GenerateToken (GenerateTokenReq) returns (GenerateTokenRes);
+  
+  // Token 校验
+  rpc VerifyToken (VerifyTokenReq) returns (VerifyTokenRes);
+  
+  // Token 刷新
+  rpc RefreshToken (RefreshTokenReq) returns (RefreshTokenRes);
+  
+  // 短信发送
+  rpc SendSms (SendSmsReq) returns (SendSmsRes);
+}
+enum SMS_TYPE {
+  SMS_TYPE_UNKNOWN = 0;
+  SMS_TYPE_LOGIN   = 1;
+}
+enum DEVICE_TYPE {
+  DEVICE_TYPE_UNKNOWN = 0;
+  DEVICE_TYPE_ANDROID = 1;
+  DEVICE_TYPE_IOS     = 2;
+}
+message RegisterDeviceReq {
+  base.BaseAuth auth             = 1;
+  string        client_device_id = 2; // 客户端设备ID
+  DEVICE_TYPE   device_type      = 3; //设备类型
+  string        version          = 4; // APP版本号
+  string        device_name      = 5; // 设备名称
+  string        os               = 6; // 设备系统类型
+  string        exchange_key     = 7;
+}
+
+message RegisterDeviceRes {
+  uint64 device_id    = 1;
+  string exchange_key = 2;
+}
+
+message Token {
+  string access_token  = 1;
+  int64  access_expire = 2;
+  int64  refresh_after = 3;
+}
+
+message SendSmsReq {
+  base.BaseAuth auth      = 1;
+  string        mobile    = 2; // @gotag`validate:"required,phoneNum"`     // 手机号
+  SMS_TYPE      sms_type  = 3; // @gotag  `validate:"required,min=1,max=2"` // 短信类型 1登录
+  string        device_id = 4; //@gotag `validate:"required"`            // 设备ID
+}
+
+message SendSmsRes {
+  string code = 2;
+}
+
+message LoginReq {
+  base.BaseAuth auth      = 1;
+  string        mobile    = 2;
+  string        code      = 3;
+  uint64        device_id = 4;
+}
+
+message LoginRes {
+  Token         token = 1;
+  base.UserInfo user  = 2;
+}
+
+message LogoutReq {
+  base.BaseAuth auth = 1;
+}
+
+message LogoutRes {}
+
+message GenerateTokenReq {
+  base.UserInfo user_info = 1;
+}
+
+message GenerateTokenRes {
+  Token token = 1;
+}
+
+message RefreshTokenReq {
+  base.BaseAuth auth = 1;
+}
+
+message RefreshTokenRes {
+  Token token = 1;
+}
+
+message UserDetail {
+  uint64 uid          = 1;
+  string nick_name    = 2;
+  string avatar       = 3;
+  uint64 created_time = 4;
+}
+
+message UserDetailReq {
+  base.BaseAuth auth = 1;
+}
+
+message UserDetailRes {
+  UserDetail detail = 1;
+}
+
+message VerifyTokenReq {
+  string access_token = 1;
+}
+
+message VerifyTokenRes {
+  base.UserInfo token_info = 1;
+}
+

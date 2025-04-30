@@ -12,6 +12,7 @@ gproto:
 	@goctl rpc protoc ./rpc/usersv.proto --style=go_zero  --proto_path=. --go_out=.  --zrpc_out=. --go-grpc_out=.  -m 
 	@protoc-go-inject-tag -input="./rpc/*.pb.go"
 	@protofmt -w rpc/*.proto
+	@mv ./internal/server server
 	@rm -rf internal etc *.go
 desc:
 	protoc --descriptor_set_out=./descriptor/usersv.pb  ./rpc/usersv.proto ./rpc/base.proto 

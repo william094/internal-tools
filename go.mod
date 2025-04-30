@@ -1,4 +1,4 @@
-module internal_tools
+module github.com/william094/internal-tools
 
 go 1.24.1
 
